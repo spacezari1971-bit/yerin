@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>뚱의 홈페이지</title>
+  <meta name="description" content="뚱의 홈페이지 - 품격 있는 공간에서 즐기는 정통 15x15 오목(Gomoku) 게임과 인공지능 대전">
+  
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22><text y=%2222%22 font-size=%2222%22>👑</text></svg>">
+</head>
+<body>
+  <!-- Handsome Korean Man Background & Ambient Overlay -->
+  <div class="bg-container">
+    <img src="assets/bg.jpg" alt="뚱의 배경화면" class="bg-image">
+  </div>
+  <div class="bg-overlay"></div>
+  <div class="glow-orb glow-orb-1"></div>
+  <div class="glow-orb glow-orb-2"></div>
+
+  <!-- Confetti Canvas for Victory Effects -->
+  <canvas id="confettiCanvas"></canvas>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="nav-brand" data-target="view-home">
+      <span class="brand-badge">DDUNG</span>
+      <span class="brand-text">뚱의 홈페이지</span>
+    </div>
+    <ul class="nav-menu">
+      <li><a href="#home" class="nav-link active" data-target="view-home">홈</a></li>
+      <li><a href="#game" class="nav-link" data-target="view-game">오목 대국실</a></li>
+      <li><a href="#profile" class="nav-link" data-target="view-home">소개</a></li>
+      <li><a href="#guestbook" class="nav-link" data-target="view-home">방명록</a></li>
+    </ul>
+    <button class="nav-cta" id="navOmokCta">
+      <span>⚔️</span> 오목 시작
+    </button>
+  </nav>
+
+  <!-- Main Content Container -->
+  <main class="container">
+    
+    <!-- ================= VIEW 1: HOME VIEW ================= -->
+    <section id="view-home" class="view-section active-view">
+      <!-- Hero & Game Launcher Section -->
+      <div class="hero-wrapper">
+        <div class="hero-content">
+          <div class="hero-tag">
+            <span>✨</span> Welcome to Ddung's Lounge
+          </div>
+          <h1 class="hero-title">
+            품격 있는 휴식과<br>
+            <span>지혜의 한 수, 뚱의 홈페이지</span>
+          </h1>
+          <p class="hero-desc">
+            도시의 야경과 따뜻한 커피 한 잔이 어우러진 뚱의 특별한 공간에 오신 것을 환영합니다. 
+            스마트한 인공지능 및 친구와 함께 정통 15x15 오목 대국을 즐겨보세요.
+          </p>
+          <div class="hero-actions">
+            <button class="nav-cta" id="heroPlayBtn" style="padding: 12px 26px; font-size: 1rem;">
+              <span>🎮</span> 지금 오목 한 판 두기
+            </button>
+            <a href="omok.html" class="game-back-btn" style="text-decoration: none; padding: 12px 20px;">
+              <span>🔗</span> 단독 대국실 열기
+            </a>
+          </div>
+        </div>
+
+        <!-- Featured Omok Launcher Card -->
+        <div class="game-launch-card" id="gameLaunchCard" title="클릭하여 오목 대국실로 이동">
+          <div class="card-badge-live">
+            <div class="pulse-dot"></div>
+            <span>대국 준비 완료</span>
+          </div>
+          <div class="launch-card-header">
+            <h3><span>⚫⚪</span> 정통 15x15 오목</h3>
+            <p>화면을 클릭하면 바로 오목 대국실로 입장합니다.</p>
+          </div>
+
+          <!-- Realistic Mini Preview Board -->
+          <div class="mini-board-preview">
+            <div class="preview-stone b1"></div>
+            <div class="preview-stone w1"></div>
+            <div class="preview-stone b2"></div>
+            <div class="preview-stone w2"></div>
+            <div class="preview-stone b3"></div>
+            <div class="preview-stone w3"></div>
+            <div class="preview-stone b4"></div>
+          </div>
+
+          <button class="preview-cta-btn">
+            <span>👉</span> 오목 대국실 입장하기 (Click to Play)
+          </button>
+        </div>
+      </div>
+
+      <!-- Secondary Info Grid (Profile & Guestbook) -->
+      <div class="grid-section">
+        <!-- Profile Card -->
+        <div class="glass-card" id="profile">
+          <div class="card-title-bar">
+            <div class="card-title">
+              <span>👑</span> 호스트 뚱(Ddung) 소개
+            </div>
+            <span style="font-size: 0.8rem; color: var(--text-gold); font-weight: 700;">PROFILES</span>
+          </div>
+          <div class="profile-card-inner">
+            <img src="assets/bg.jpg" alt="뚱 프로필 사진" class="profile-avatar">
+            <div class="profile-info">
+              <h3>뚱 (Ddung)</h3>
+              <p>“승부는 반상 위의 한 수에서 갈린다.”<br>언제나 여유와 품격을 잃지 않는 오목 매니아.</p>
+            </div>
+          </div>
+          <div class="stats-bar">
+            <div class="stat-box">
+              <div class="num" id="mainTotalGames">0</div>
+              <div class="label">총 대국수</div>
+            </div>
+            <div class="stat-box">
+              <div class="num" id="mainWinRate">0%</div>
+              <div class="label">승률</div>
+            </div>
+            <div class="stat-box">
+              <div class="num">오목 3단</div>
+              <div class="label">현재 랭크</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Guestbook Card -->
+        <div class="glass-card" id="guestbook">
+          <div class="card-title-bar">
+            <div class="card-title">
+              <span>💬</span> 실시간 방명록
+            </div>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">GUESTBOOK</span>
+          </div>
+          <form class="guestbook-form" id="guestbookForm">
+            <input type="text" id="guestbookInput" class="guestbook-input" placeholder="뚱에게 응원의 한마디를 남겨보세요!" maxlength="50" required>
+            <button type="submit" class="guestbook-btn">등록</button>
+          </form>
+          <div class="guestbook-list" id="guestbookList">
+            <!-- Dynamic Guestbook Entries -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= VIEW 2: OMOK GAME VIEW ================= -->
+    <section id="view-game" class="view-section">
+      <div class="game-container">
+        <!-- Main Board Card -->
+        <div class="game-board-card">
+          <div class="game-header-bar">
+            <button class="game-back-btn" id="backToHomeBtn">
+              <span>←</span> 메인으로 돌아가기
+            </button>
+            <div class="turn-banner">
+              <div class="turn-stone black" id="turnStoneIndicator"></div>
+              <span class="turn-text" id="turnText">내 차례 (흑돌)</span>
+            </div>
+          </div>
+
+          <!-- Board Canvas -->
+          <div class="board-wrapper">
+            <canvas id="omokCanvas"></canvas>
+          </div>
+        </div>
+
+        <!-- Side Control Panel -->
+        <aside class="game-side-panel">
+          <!-- Game Settings & Modes -->
+          <div class="panel-card">
+            <div class="panel-card-title">
+              <span>⚙️</span> 대국 모드 선택
+            </div>
+            <div class="mode-selector">
+              <button class="mode-btn active" data-mode="ai">🤖 AI 대전</button>
+              <button class="mode-btn" data-mode="pvp">👥 2인 대전</button>
+            </div>
+
+            <!-- AI Difficulty Container -->
+            <div id="aiDifficultyContainer" class="ai-difficulty-selector">
+              <button class="diff-btn" data-diff="easy">1단 (초급)</button>
+              <button class="diff-btn" data-diff="normal">2단 (중급)</button>
+              <button class="diff-btn active" data-diff="hard">3단 (고급)</button>
+            </div>
+
+            <!-- Action Controls -->
+            <div class="btn-group">
+              <button class="ctrl-btn btn-restart" id="btnRestart">
+                <span>🔄</span> 판 쓸기 (새 게임)
+              </button>
+              <button class="ctrl-btn btn-undo" id="btnUndo">
+                <span>↩️</span> 한 수 무르기
+              </button>
+              <button class="ctrl-btn btn-sound sound-on" id="btnSound">
+                <span>🔊</span> 착수 효과음
+              </button>
+            </div>
+          </div>
+
+          <!-- Score & Stats Tile -->
+          <div class="panel-card">
+            <div class="panel-card-title">
+              <span>📊</span> 나의 대국 기록실
+            </div>
+            <div class="game-stats-grid">
+              <div class="stat-tile">
+                <div class="val" id="statTotalGames">0</div>
+                <div class="sub">총 게임수</div>
+              </div>
+              <div class="stat-tile">
+                <div class="val" id="statWinRate">0%</div>
+                <div class="sub">승률</div>
+              </div>
+              <div class="stat-tile">
+                <div class="val" id="statWinLoss">0승 0패</div>
+                <div class="sub">전적</div>
+              </div>
+              <div class="stat-tile">
+                <div class="val" id="statMoveCount">0</div>
+                <div class="sub">현재 착수수</div>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Victory / Game Over Modal -->
+  <div class="modal-overlay" id="victoryModal">
+    <div class="victory-modal">
+      <div class="modal-trophy">🏆</div>
+      <h2 class="modal-winner-title" id="modalWinnerTitle">대승리!</h2>
+      <p class="modal-winner-desc" id="modalWinnerDesc">멋진 수로 승리를 쟁취하셨습니다!</p>
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button class="ctrl-btn btn-restart" id="modalRestartBtn" style="padding: 12px 24px; width: auto;">
+          <span>🔄</span> 다시 한 판
+        </button>
+        <button class="ctrl-btn btn-undo" id="modalCloseBtn" style="padding: 12px 20px; width: auto;">
+          닫기
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>© 2026 뚱의 홈페이지 (Ddung's Studio) - All Rights Reserved. Master of Gomoku.</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="game.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
