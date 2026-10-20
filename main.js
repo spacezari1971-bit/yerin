@@ -1,11 +1,35 @@
 /**
  * 뚱의 홈페이지 - Main App Controller & Interactions
+ * 오목(Omok) & 훈남 블록블라스트(Block Blast) 듀얼 게임 허브 제어
  */
 
 document.addEventListener('DOMContentLoaded', () => {
   // Initialize Omok Game Instance
   const omok = new OmokGame('omokCanvas');
   window.currentOmok = omok;
+
+  // Initialize Block Blast Game Instance
+  const blockBlast = new BlockBlastGame({
+    boardId: 'bbBoard',
+    dockId: 'bbDock',
+    canvasId: 'bbParticleCanvas',
+    scoreId: 'bbScore',
+    highScoreId: 'bbHighScore',
+    comboBadgeId: 'bbComboBadge',
+    comboCountId: 'bbComboCount',
+    statLinesId: 'bbStatLines',
+    statMaxComboId: 'bbStatMaxCombo',
+    statBlocksId: 'bbStatBlocks',
+    statTierId: 'bbStatTier',
+    modalId: 'bbGameOverModal',
+    modalScoreId: 'bbModalScore',
+    modalHighScoreId: 'bbModalHighScore',
+    modalNewRecordId: 'bbModalNewRecord',
+    modalLinesId: 'bbModalLines',
+    modalMaxComboId: 'bbModalMaxCombo',
+    modalRestartId: 'bbModalRestartBtn'
+  });
+  window.currentBlockBlast = blockBlast;
 
   // View Navigation Elements
   const navLinks = document.querySelectorAll('.nav-link[data-target]');
@@ -14,6 +38,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const heroPlayBtn = document.getElementById('heroPlayBtn');
   const navOmokCta = document.getElementById('navOmokCta');
   const backToHomeBtn = document.getElementById('backToHomeBtn');
+  const mainBbHighScore = document.getElementById('mainBbHighScore');
+
+  function updateHomeStats() {
+    if (mainBbHighScore && blockBlast) {
+      mainBbHighScore.textContent = blockBlast.getHighScore().toLocaleString();
+    }
+  }
 
   // Switch View Helper
   function switchView(targetId) {
@@ -36,13 +67,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // Resize canvas if needed
+    // Handle game resizes & state
     if (targetId === 'view-game' && omok) {
       omok.draw();
+    } else if (targetId === 'view-home' && blockBlast) {
+      updateHomeStats();
+      setTimeout(() => {
+        blockBlast.renderBoard();
+        blockBlast.renderDock();
+        if (blockBlast.particlesCanvas && blockBlast.boardEl) {
+          const rect = blockBlast.boardEl.getBoundingClientRect();
+          blockBlast.particlesCanvas.width = rect.width;
+          blockBlast.particlesCanvas.height = rect.height;
+        }
+      }, 50);
     }
   }
 
-  // Bind View Switches
+  // Bind View Switches for Nav Links
   navLinks.forEach(link => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
@@ -51,6 +93,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Nav Brand to Home
+  const navBrand = document.querySelector('.nav-brand');
+  if (navBrand) {
+    navBrand.addEventListener('click', () => switchView('view-home'));
+  }
+
+  // Omok View Switches
   if (gameLaunchCard) {
     gameLaunchCard.addEventListener('click', () => switchView('view-game'));
   }
@@ -64,8 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
     backToHomeBtn.addEventListener('click', () => switchView('view-home'));
   }
 
-  // === Game Control Bindings ===
-  // Mode Selectors (AI vs 2 Player)
+  // === Omok Game Control Bindings ===
   const modeBtns = document.querySelectorAll('.mode-btn');
   const aiDiffContainer = document.getElementById('aiDifficultyContainer');
   
@@ -82,7 +130,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // AI Difficulty Selectors
   const diffBtns = document.querySelectorAll('.diff-btn');
   diffBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -93,7 +140,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Control Buttons
   const btnRestart = document.getElementById('btnRestart');
   const btnUndo = document.getElementById('btnUndo');
   const btnSound = document.getElementById('btnSound');
@@ -112,8 +158,8 @@ document.addEventListener('DOMContentLoaded', () => {
       omok.soundEnabled = !omok.soundEnabled;
       btnSound.classList.toggle('sound-on', omok.soundEnabled);
       btnSound.innerHTML = omok.soundEnabled 
-        ? '<span>🔊</span> 효과음 켜짐' 
-        : '<span>🔇</span> 효과음 꺼짐';
+        ? '<span>🔊</span> 착수 효과음 켜짐' 
+        : '<span>🔇</span> 착수 효과음 꺼짐';
     });
   }
 
@@ -126,15 +172,39 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // === Block Blast Game Control Bindings ===
+  const bbBtnRestart = document.getElementById('bbBtnRestart');
+  const bbBtnSound = document.getElementById('bbBtnSound');
+  const bbModalCloseBtn = document.getElementById('bbModalCloseBtn');
+  const bbGameOverModal = document.getElementById('bbGameOverModal');
+
+  if (bbBtnRestart) {
+    bbBtnRestart.addEventListener('click', () => blockBlast.restart());
+  }
+  if (bbBtnSound) {
+    bbBtnSound.addEventListener('click', () => {
+      const isSound = blockBlast.toggleSound();
+      bbBtnSound.classList.toggle('sound-on', isSound);
+      bbBtnSound.innerHTML = isSound 
+        ? '<span>🔊</span> 효과음 켜짐' 
+        : '<span>🔇</span> 효과음 꺼짐';
+    });
+  }
+  if (bbModalCloseBtn) {
+    bbModalCloseBtn.addEventListener('click', () => {
+      if (bbGameOverModal) bbGameOverModal.classList.remove('show');
+    });
+  }
+
   // === Guestbook Logic ===
   const guestbookForm = document.getElementById('guestbookForm');
   const guestbookInput = document.getElementById('guestbookInput');
   const guestbookList = document.getElementById('guestbookList');
 
   const defaultMessages = [
-    { text: "뚱님 안녕하세요! 홈페이지 분위기 최고네요 ✨", time: "방금 전" },
-    { text: "오목 AI 3단 너무 잘두네요! 한 판 더 도전합니다 🔥", time: "10분 전" },
-    { text: "배경 사진 대박 멋져요~ 자주 놀러올게요!", time: "1시간 전" }
+    { text: "뚱님 안녕하세요! 블록블라스트 훈남 블록 너무 취향저격이에요 💖", time: "방금 전" },
+    { text: "블록블라스트 5000점 넘어서 뚱의 전설 티어 달성했습니다 🔥", time: "10분 전" },
+    { text: "오목 AI 3단도 재밌고 블록블라스트 손맛 대박입니다!", time: "1시간 전" }
   ];
 
   function loadGuestbook() {
@@ -200,4 +270,5 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   loadGuestbook();
+  updateHomeStats();
 });
